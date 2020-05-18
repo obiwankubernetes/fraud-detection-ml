@@ -1,0 +1,226 @@
+### Neural Nets
+
+We are not running neural nets in this Rmarkdown because they took over a day combined on the initial runs, but including code here, and the outputs are in our presentation slides.
+
+### Neural Net without Oversampling Skewed Data
+```{r eval=FALSE}
+#load packages
+library(neuralnet)
+library(caret)
+
+# Define training and validation datasets
+set.seed(618)
+vTrainRows <- sample(1:nrow(dfCC_norm), 0.8*nrow(dfCC_norm))
+dfCC_norm_train <- dfCC_norm[vTrainRows,] 
+dfCC_norm_val <- dfCC_norm[-vTrainRows,] 
+vCC_norm_valY <- as.factor(dfCC_norm_val$Class)
+
+# Define Neural Network Model Hidden=1
+model1 <- neuralnet(Class ~ ., dfCC_norm_train,  hidden=1)
+plot(model1)
+
+#create predictions and confusion matrix
+vModel1_pred <- as.vector(predict(model1, dfCC_norm_val))
+vModel1_predF <- as.factor(ifelse(vModel1_pred<0.5, "0", "1"))
+confusionMatrix(vModel1_predF, vCC_norm_valY, positive="1")
+
+# Define Neural Network Model Hidden=2
+model2 <- neuralnet(Class ~ ., dfCC_norm_train,  hidden=2)
+plot(model2)
+
+#create predictions and confusion matrix
+vModel2_pred <- as.vector(predict(model2, dfCC_norm_val))
+vModel2_predF <- as.factor(ifelse(vModel2_pred<0.5, "0", "1"))
+confusionMatrix(vModel2_predF, vCC_norm_valY, positive="1")
+
+# Define Neural Network Model Hidden=3
+model3 <- neuralnet(Class ~ ., dfCC_norm_train,  hidden=3)
+plot(model3)
+
+#created predictions and confusion matrix
+vModel3_pred <- as.vector(predict(model3, dfCC_norm_val))
+vModel3_predF <- as.factor(ifelse(vModel3_pred<0.5, "0", "1"))
+confusionMatrix(vModel3_predF, vCC_norm_valY, positive="1")
+
+# Define Neural Network Model Hidden=1,2
+model4 <- neuralnet(Class ~ ., dfCC_norm_train,  hidden=c(1,2))
+plot(model4)
+
+#create predictions and confusion matrix
+vModel4_pred <- as.vector(predict(model4, dfCC_norm_val))
+vModel4_predF <- as.factor(ifelse(vModel4_pred<0.5, "0", "1"))
+confusionMatrix(vModel4_predF, vCC_norm_valY, positive="1")
+
+# Define Neural Network Model Hidden=2,2
+model5 <- neuralnet(Class ~ ., dfCC_norm_train,  hidden=c(2,2))
+plot(model5)
+
+#create predictions and confusion matrix
+vModel5_pred <- as.vector(predict(model5, dfCC_norm_val))
+vModel5_predF <- as.factor(ifelse(vModel5_pred<0.5, "0", "1"))
+confusionMatrix(vModel5_predF, vCC_norm_valY, positive="1")
+
+# Define Neural Network Model Hidden=3,2
+model6 <- neuralnet(Class ~ ., dfCC_norm_train,  hidden=c(3,2))
+plot(model5)
+
+#create predictions and confusion matrix
+vModel6_pred <- as.vector(predict(model6, dfCC_norm_val))
+vModel6_predF <- as.factor(ifelse(vModel6_pred<0.5, "0", "1"))
+confusionMatrix(vModel6_predF, vCC_norm_valY, positive="1")
+```
+
+### Neural Net with Oversampling
+```{r eval=FALSE}
+#load packages
+library(DMwR)
+
+# Oversample the fraudulent transactions
+dfCC_norm_train$Class <- as.factor(dfCC_norm_train$Class)
+dfCC_norm_val$Class <- as.factor(dfCC_norm_val$Class)
+
+dfCC_norm_train1 <- SMOTE(Class ~ ., dfCC_norm_train, perc.over=600, perc.under=100)
+dfCC_norm_train1$Class <- as.integer(dfCC_norm_train1$Class)
+dfCC_norm_train1$Class <- ifelse(dfCC_norm_train1$Class==1, 0, 1)
+
+dfCC_norm_train2 <- SMOTE(Class ~ ., dfCC_norm_train, perc.over=1200, perc.under=100)
+dfCC_norm_train2$Class <- as.integer(dfCC_norm_train2$Class)
+dfCC_norm_train2$Class <- ifelse(dfCC_norm_train2$Class==1, 0, 1)
+
+dfCC_norm_train3 <- SMOTE(Class ~ ., dfCC_norm_train, perc.over=600, k=2, perc.under=100)
+dfCC_norm_train3$Class <- as.integer(dfCC_norm_train3$Class)
+dfCC_norm_train3$Class <- ifelse(dfCC_norm_train3$Class==1, 0, 1)
+
+dfCC_norm_train4 <- SMOTE(Class ~ ., dfCC_norm_train, perc.over=2400, perc.under=100)
+dfCC_norm_train4$Class <- as.integer(dfCC_norm_train4$Class)
+dfCC_norm_train4$Class <- ifelse(dfCC_norm_train4$Class==1, 0, 1)
+
+dfCC_norm_train5 <- SMOTE(Class ~ ., dfCC_norm_train, perc.over=2400, perc.under=200)
+dfCC_norm_train5$Class <- as.integer(dfCC_norm_train5$Class)
+dfCC_norm_train5$Class <- ifelse(dfCC_norm_train5$Class==1, 0, 1)
+
+dfCC_norm_train6 <- SMOTE(Class ~ ., dfCC_norm_train, perc.over=2400, perc.under=200)
+dfCC_norm_train6$Class <- as.integer(dfCC_norm_train6$Class)
+dfCC_norm_train6$Class <- ifelse(dfCC_norm_train6$Class==1, 0, 1)
+
+# Define Neural Network Model Hidden=1
+model1 <- neuralnet(Class ~ ., dfCC_norm_train1,  hidden=1, stepmax=1e+06)
+plot(model1)
+
+#create predictions and confusion matrix
+vModel1_pred <- as.vector(predict(model1, dfCC_norm_val))
+vModel1_predF <- as.factor(ifelse(vModel1_pred<0.5, "0", "1"))
+confusionMatrix(vModel1_predF, vCC_norm_valY, positive="1")
+
+# NN model 2
+model2 <- neuralnet(Class ~ ., dfCC_norm_train2,  hidden=1, stepmax=1e+06)
+plot(model2)
+
+#create predictions and confusion matrix
+vModel2_pred <- as.vector(predict(model2, dfCC_norm_val))
+vModel2_predF <- as.factor(ifelse(vModel2_pred<0.5, "0", "1"))
+confusionMatrix(vModel2_predF, vCC_norm_valY, positive="1")
+
+#NN model 3
+model3 <- neuralnet(Class ~ ., dfCC_norm_train3,  hidden=1, stepmax=1e+06)
+plot(model3)
+
+#create predictions and confusion matrix
+vModel3_pred <- as.vector(predict(model3, dfCC_norm_val))
+vModel3_predF <- as.factor(ifelse(vModel3_pred<0.5, "0", "1"))
+confusionMatrix(vModel3_predF, vCC_norm_valY, positive="1")
+
+#NN model 4
+model4 <- neuralnet(Class ~ ., dfCC_norm_train4,  hidden=1, stepmax=1e+06)
+plot(model4)
+
+#create predictions and confusion matrix
+vModel4_pred <- as.vector(predict(model4, dfCC_norm_val))
+vModel4_predF <- as.factor(ifelse(vModel4_pred<0.5, "0", "1"))
+confusionMatrix(vModel4_predF, vCC_norm_valY, positive="1")
+
+#NN model 5
+model5 <- neuralnet(Class ~ ., dfCC_norm_train5,  hidden=1, stepmax=1e+06)
+plot(model5)
+
+#create predictions and confusion matrix
+vModel5_pred <- as.vector(predict(model5, dfCC_norm_val))
+vModel5_predF <- as.factor(ifelse(vModel5_pred<0.5, "0", "1"))
+confusionMatrix(vModel5_predF, vCC_norm_valY, positive="1")
+
+#NN model 6
+model6 <- neuralnet(Class ~ ., dfCC_norm_train6,  hidden=c(2,1), stepmax=1e+08)
+plot(model6)
+
+#create predictions and confusion matrix
+vModel6_pred <- as.vector(predict(model6, dfCC_norm_val))
+vModel6_predF <- as.factor(ifelse(vModel6_pred<0.5, "0", "1"))
+confusionMatrix(vModel6_predF, vCC_norm_valY, positive="1")
+
+######## ========================== 
+
+# Define Neural Network Model Hidden=2
+model2 <- neuralnet(Class ~ ., dfCC_norm_train,  hidden=2)
+plot(model2)
+
+#create predictions and confusion matrix
+vModel2_pred <- as.vector(predict(model2, dfCC_norm_val))
+vModel2_predF <- as.factor(ifelse(vModel2_pred<0.5, "0", "1"))
+confusionMatrix(vModel2_predF, vCC_norm_valY, positive="1")
+
+# Define Neural Network Model Hidden=3
+model3 <- neuralnet(Class ~ ., dfCC_norm_train,  hidden=3)
+plot(model3)
+
+#create predictions and confusion matrix
+vModel3_pred <- as.vector(predict(model3, dfCC_norm_val))
+vModel3_predF <- as.factor(ifelse(vModel3_pred<0.5, "0", "1"))
+confusionMatrix(vModel3_predF, vCC_norm_valY, positive="1")
+
+# Define Neural Network Model Hidden=1,2
+model4 <- neuralnet(Class ~ ., dfCC_norm_train,  hidden=c(1,2))
+plot(model4)
+
+#create predictions and confusion matrix
+vModel4_pred <- as.vector(predict(model4, dfCC_norm_val))
+vModel4_predF <- as.factor(ifelse(vModel4_pred<0.5, "0", "1"))
+confusionMatrix(vModel4_predF, vCC_norm_valY, positive="1")
+
+#Define Neural Network Model Hidden=2,2
+model5 <- neuralnet(Class ~ ., dfCC_norm_train,  hidden=c(2,2))
+plot(model5)
+
+#create predictions and confusion matrix
+vModel5_pred <- as.vector(predict(model5, dfCC_norm_val))
+vModel5_predF <- as.factor(ifelse(vModel5_pred<0.5, "0", "1"))
+confusionMatrix(vModel5_predF, vCC_norm_valY, positive="1")
+
+#Define Neural Network Model Hidden=3,2
+model6 <- neuralnet(Class ~ ., dfCC_norm_train,  hidden=c(3,2))
+plot(model5)
+
+#create predictions and confusion matrix
+vModel6_pred <- as.vector(predict(model6, dfCC_norm_val))
+vModel6_predF <- as.factor(ifelse(vModel6_pred<0.5, "0", "1"))
+confusionMatrix(vModel6_predF, vCC_norm_valY, positive="1")
+```
+
+### V) Analysis of Models & Results
+
+One of the biggest learnings from our models is that often even a complicated neural network algorithm can be bested by a more simple one depending on the specific dataset that is used. 
+
+Our neural network model predicts over 90% of credit card frauds, and with blinded variables, it does a great job with our resampled results. As our dependent variables were very uneven, resampling helped us not only improve our accuracy but also our own intuition about the success of the data. 
+
+Our first neural network model with one neuron had a run time of over a day and a kappa value of 0.8249 and an accuracy of 0.9994. However, there was still the issue of uneven datasets so we resampled our data. Once we resmapled our data using SMOTE, our accuracy reduced to 0.9823 with a Kappa of 0.1608 but it was more balanced and most likely, a lot more applicable to the real world.
+
+Finally using a boosted decision tree, we were able to predct with a 0.9995 accuracy and a Kappa of 0.8693. We felt confident that this was the best model and it did not need any resampling either. 
+
+### VI) Limitations of Data & Models
+
+Our biggest limitation was that all of our independent variables were blinded. That stopped us from looking at combinations of dependent variables like we have done in our other analyses. Being able to look at the interplay of different independent variables would have gotten us further in building a more nuanced model. 
+
+Further, our data was unbalanced with a lot more non-fraud cases than fraud ones which led us to resample our data but at the same time made our first neural net model overfit the relationships between the independent and dependent variables.
+
+### VII) Recommendations & Next Steps
+
+Our recommendation is to go ahead with the decision tree model, but also improve it with more trials and perhaps gathering even more data for our test dataset. Currently, our accuracy is very high, but we would like to test it for even more fraud cases to see how it stacks against new data.

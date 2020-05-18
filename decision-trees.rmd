@@ -1,0 +1,41 @@
+### Decision Trees
+```{r}
+#loading packages
+library(C50)
+library(gmodels)
+
+#using random testing/training sets from previous block
+
+#changing class to factor
+dfCC$Class <- as.factor(dfCC$Class)
+
+#creating 1st c50 model
+dfCC_model <- C5.0(dfCC_train[-31], dfCC_train$Class)
+
+#display tree
+dfCC_model
+
+#creating predictions on test data
+dfCC_pred <- predict(dfCC_model, dfCC_test)
+
+#cross-tabbing predicted versus actual
+CrossTable(dfCC_test$Class, dfCC_pred,
+           prop.chisq = FALSE, prop.c = FALSE, prop.r = FALSE,
+           dnn = c('actual default', 'predicted default'))
+
+#2nd c50 model boosting with 10 trials
+dfCC_boost10 <- C5.0(dfCC_train[-31], dfCC_train$Class,
+                       trials = 10)
+
+#viewing 2nd model
+dfCC_boost10
+summary(dfCC_boost10)
+
+#creating predictions
+dfCC_boost_pred10 <- predict(dfCC_boost10, dfCC_test)
+
+#cross-taabbing boost predicted vs actual
+CrossTable(dfCC_test$Class, dfCC_boost_pred10,
+           prop.chisq = FALSE, prop.c = FALSE, prop.r = FALSE,
+           dnn = c('actual default', 'predicted default'))
+```

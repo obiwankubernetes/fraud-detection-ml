@@ -1,0 +1,37 @@
+### SVM
+```{r}
+#install packages
+library(kernlab)
+
+#using training/testing data sets from previous blocks
+
+#creating vanilla SVM
+dfCC_classifier <- ksvm(Class ~ ., data = dfCC_train,
+                          kernel = "vanilladot")
+
+#viewing vanilla SVM
+dfCC_classifier
+
+#creating predictions on testing dataset
+dfCC_predictions <- predict(dfCC_classifier, dfCC_test)
+
+#viewing and tabling predictions vs actual
+View(dfCC_predictions)
+table(dfCC_predictions, dfCC_test$Class)
+
+#looking agreement vs. non-agreement by constructing a vector of TRUE/FALSE indicating correct/incorrect predictions
+agreement <- dfCC_predictions == dfCC_test$Class
+table(agreement)
+prop.table(table(agreement))
+
+#Improving SVM model performance with RBF kernal
+dfCC_classifier_rbf <- ksvm(Class ~ ., data = dfCC_train, kernel = "rbfdot")
+
+#creating predictions
+dfCC_predictions_rbf <- predict(dfCC_classifier_rbf, dfCC_test)
+
+#looking at agreement vs. non-agreement by constructing a vector of TRUE/FALSE indicating correct/incorrect predictions
+agreement_rbf <- dfCC_predictions_rbf == dfCC_test$Class
+table(agreement_rbf)
+prop.table(table(agreement_rbf))
+```

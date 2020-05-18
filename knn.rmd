@@ -1,0 +1,21 @@
+### kNN
+```{r}
+#loading packages
+library(class)
+library(gmodels)
+
+#creating random Testing/Training Sets
+set.seed(12345)
+dfCC_rand <- dfCC_norm[order(runif(nrow(dfCC))),]
+dfCC_train <- dfCC_norm[1:227846, ]
+dfCC_test <- dfCC_norm[227847:284807, ]
+dfCC_train_labels <- dfCC_norm[1:227846, 31]
+dfCC_test_labels <- dfCC_norm[227847:284807, 31]
+
+#1st kNN model
+dfCC_test_pred <- knn(train = dfCC_train, test = dfCC_test,
+                      cl = dfCC_train_labels, k=3)
+
+#creating cross table
+CrossTable(x = dfCC_test_labels, y = dfCC_test_pred, 
+           prop.chisq=FALSE)

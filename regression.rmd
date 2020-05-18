@@ -1,0 +1,47 @@
+### IV) Building Different Models
+
+### Linear Regression
+```{r}
+#1st model w/ all variables
+linreg <- lm(Class ~ . , data = dfCC_norm)
+
+#viewing model
+summary(linreg)
+
+#getting rid of variable 'V23' because it is insignificant
+dfCC_linreg_insig <- dfCC_norm
+dfCC_linreg_insig$V23 <- NULL
+
+#2nd model w/ all significant variables
+linreg <- lm(Class ~ . , data = dfCC_linreg_insig)
+```
+
+### Logistical Regression
+```{r}
+#loading packages
+library(lattice)
+library(ggplot2)
+library(caret)
+library(e1071)
+
+#1st model w/ all variables
+logit.model <- glm(Class ~ . , data = dfCC_norm, family = "binomial" )
+
+#viewing 1st model
+summary(logit.model)
+
+#creating predictions
+pred <- predict(logit.model, newdata = dfCC_norm, type = "response")
+predbinary <- ifelse(pred>0.5,1,0)
+
+
+#factorizing
+predbinary <- as.factor(predbinary)
+dfCC_norm$Class <- as.factor(dfCC_norm$Class)
+
+#creating confusion matrix
+confusionMatrix(predbinary, dfCC_norm$Class, positive="1")
+
+
+
+
